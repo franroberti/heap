@@ -22,7 +22,7 @@ heap_t *heap_crear(cmp_func_t cmp){
 	if(!heap)
 		return NULL;
 
-	heap->array = malloc(sizeof(*char)*CANTIDAD_INICIAL);	
+	heap->array = malloc(sizeof(char*)*CANTIDAD_INICIAL);	
 
 	if(!heap->array){
 		free(heap);
@@ -43,7 +43,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 	for(size_t i=0;<n;i++){	
 
 		if(heap->cantidad >= (heap->capacidad*FACTOR_DE_CARGA))
-			heap_redimensionar(heap,heap->capacidad*2);
+			heap_redimensionar(heap,heap->capacidad*INCREMENTO_CAPACIDAD); //podria validar
 
 		heap->arreglo[i] = arreglo[i];
 
@@ -67,7 +67,10 @@ void *heap_ver_max(const heap_t *heap){
 
 void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
 	
-	for(i=0;i<heap->cantidad;i++){
+	if(!heap || !heap->cantidad)
+		return;
+
+	for(size_t i=0;i<heap->cantidad;i++){
 		if(destruir_elemento)
 			destruir_elemento(heap->arreglo[i]);	
 
@@ -75,4 +78,47 @@ void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
 	}
 	
 	free(heap);
+}
+
+bool heap_redimensionar(heap_t *heap,size_t nueva_dim){
+	void *aux_array;
+
+	if(!heap_aux)
+		return false;
+
+	aux = realloc(heap->arreglo,sizeof(char*)*nueva_dim);
+
+	if(!aux){
+		heap_destruir(heap_aux);
+		return false;
+	}
+
+	heap->capacidad = nueva_dim;
+
+	return true;
+}
+
+bool heap_encolar(heap_t *heap,void *elemento){
+	
+	if(!heap || !elemento)
+		return false;
+	
+	if(heap->cantidad >= (heap->capacidad*FACTOR_DE_CARGA))
+		heap_redimensionar(heap,heap->capacidad*INCREMENTO_CAPACIDAD); //podria validar
+	
+	heap->arreglo[cantidad] = elemento;
+
+	heap_sort(heap);
+
+	heap->cantidad ++;
+	
+	return false;
+}
+
+void *heap_desencolar(heap){
+	
+	//1. meter al ultimo primero y heapsort
+	//2. meter a cada uno una posicion anterior y despues heapsort
+	
+	
 }
