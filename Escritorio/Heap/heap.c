@@ -13,7 +13,7 @@ struct heap{
 	size_t capacidad;
 	cmp_func_t cmp;
 
-};
+};f
 
 heap_t *heap_crear(cmp_func_t cmp){
 	
@@ -108,7 +108,7 @@ bool heap_encolar(heap_t *heap,void *elemento){
 	
 	heap->arreglo[cantidad] = elemento;
 
-	heap_sort(heap);
+	heap_sort(heap);//reorganizar el arreglo
 
 	heap->cantidad ++;
 	
@@ -117,8 +117,63 @@ bool heap_encolar(heap_t *heap,void *elemento){
 
 void *heap_desencolar(heap){
 	
-	//1. meter al ultimo primero y heapsort
-	//2. meter a cada uno una posicion anterior y despues heapsort
+	void *aux;
+
+	if(!heap || !heap->cantidad)
+		return NULL;
+
+	aux = heap->arreglo[0];
 	
+	heap->arreglo[0] = heap->arreglo[cantidad-1];	
 	
+	heap_sort(heap);//reorganizar
+
+	heap->cantidad --;
+
+
+	return aux;
+}
+
+void heapify(heap_t *heap){
+	for(size_t i = (cantidad/2)-1;i>=0;i--){
+		downheap(heap,i);
+	}
+}
+
+//podrian recivir el arreglo down y up heap, y heapify lo mismo
+void downheap(heap_t *heap,size_t posicion){
+	size_t pos_h_izq,posi_h_der,pos_mayor;
+	
+	if(posicion > heap->cantidad)
+		return;
+
+	pos_h_izq = posicion*2+1;
+	pos_h_der = posicion*2+2;
+	pos_mayor = i;
+
+	if(pos_h_izq < heap->cantidad && heap->arreglo[posicion] < heap->arreglo[pos_h_izq])
+		pos_mayor = pos_h_izq;
+
+	if(pos_h_der < heap->cantidad && heap->arreglo[pos_mayor] < heap->arreglo[pos_h_der])
+		pos_mayor - pos_h_der;
+
+	if(pos_mayor != posicion)
+		swap(heap->arreglo[posicion],heap->arreglo[pos_mayor])
+
+	downheap(heap,pos_mayor);
+}
+
+
+void upheap(heap_t *heap,size_t posicion){
+	size_t pos_padre;
+
+	if(!posicion)
+		return;
+
+	pos_padre = (posicion-1)/2;
+
+	if(heap->arreglo[posicion]>heap->arreglo[pos_padre])
+		swap(heap->arreglo[posicion],heap->arreglo[pos_padre]);
+
+	upheap(heap,pos_padre);
 }
