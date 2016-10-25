@@ -45,9 +45,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 		if(heap->cantidad >= (heap->capacidad*FACTOR_DE_CARGA))
 			heap_redimensionar(heap,heap->capacidad*2);
 
-		heap->arreglo[i] = malloc(sizeof(char)*(strlen(arreglo[i])+1));
-
-		strcpy(heap->arreglo[i],arreglo[i]);
+		heap->arreglo[i] = arreglo[i];
 
 		heap->cantidad ++;	
 	}
@@ -70,11 +68,11 @@ void *heap_ver_max(const heap_t *heap){
 void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
 	
 	for(i=0;i<heap->cantidad;i++){
-		heap->arreglo[i];	
+		if(destruir_elemento)
+			destruir_elemento(heap->arreglo[i]);	
 
-		free(heap->arreglo[i]);
+		free(heap->arreglo);
 	}
 	
-
-
+	free(heap);
 }
