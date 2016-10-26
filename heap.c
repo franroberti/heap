@@ -169,14 +169,11 @@ void downheap(heap_t *heap,size_t posicion){
 	if(pos_h_der < heap->cantidad && heap->arreglo[pos_mayor] < heap->arreglo[pos_h_der])
 		pos_mayor = pos_h_der;
 
-	if(pos_mayor != posicion)
+
+	if(pos_mayor != posicion){
 		swap(heap->arreglo[posicion],heap->arreglo[pos_mayor]);
-
-	//No lo vi con suficiente tiempo, pero creo que puede pasar que la posicion sea la mayor de todas y en 
-	//este caso pos_mayor no va a estar definida.(En nel caso de que quede un solo elemento por ejemplo)
-	downheap(heap,pos_mayor);
-}
-
+		downheap(heap,pos_mayor);
+	}
 
 void upheap(heap_t *heap,size_t posicion){
 	size_t pos_padre;
@@ -186,8 +183,8 @@ void upheap(heap_t *heap,size_t posicion){
 
 	pos_padre = (posicion-1)/2;
 
-	if(heap->arreglo[posicion]>heap->arreglo[pos_padre])
+	if(heap->arreglo[posicion]>heap->arreglo[pos_padre]){
 		swap(heap->arreglo[posicion],heap->arreglo[pos_padre]);
-
-	upheap(heap,pos_padre);
+		upheap(heap,pos_padre);
+	}
 }
