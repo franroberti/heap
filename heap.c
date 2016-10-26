@@ -69,7 +69,6 @@ void *heap_ver_max(const heap_t *heap){
 	return heap->arreglo[0];
 }
 
-//Todavia no terminada(la comente para que compile lo otro)
 bool heap_redimensionar(heap_t *heap){
 	double fc = (double)(heap->cantidad)/((double)heap->capacidad);
 
