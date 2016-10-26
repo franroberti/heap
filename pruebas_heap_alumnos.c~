@@ -1,0 +1,184 @@
+#include "heap.h"
+#include "testing.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>  // For ssize_t in Linux.
+
+
+int comparar_cadenas(const void* a, const void*b){
+    return strcmp((char*)a,(char*)b);
+}
+
+int comparar_enteros(const void* a, const void*b){
+	if(*(int*)a > *(int*)b)
+		return 1;
+	if(*(int*)a < *(int*)b)
+		return -1;
+
+	return 0;
+}
+
+static void prueba_crear_heap_vacio()
+{
+    heap_t* heap = heap_crear(comparar_cadenas);
+
+    print_test("Prueba crear heap vacio", heap);
+    print_test("Prueba heap la cantidad de elementos es 0", heap_cantidad(heap) == 0);
+    print_test("Prueba heap esta vacio", heap_esta_vacio(heap));
+    print_test("Prueba heap ver maximo es NULL", !heap_ver_max(heap));
+    print_test("Prueba heap desencolar es NULL", !heap_desencolar(heap));
+
+    heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_encolar_cadenas(){
+    heap_t* heap = heap_crear(comparar_cadenas);
+
+    char *clave4 = "cabra";
+    char *clave2 = "gato";
+    char* clave7 = "jirafa";
+    char *clave5 = "mono";
+    char *clave1 = "perro";
+    char *clave3 = "vaca";
+    char *clave6 = "zorro";
+    
+    print_test("Prueba heap encolar clave1", heap_encolar(heap, clave1));
+    print_test("Prueba heap encolar clave2", heap_encolar(heap, clave2));
+    print_test("Prueba heap ver max es clave2", heap_ver_max(heap)==clave1);
+    print_test("Prueba heap encolar clave3", heap_encolar(heap, clave3));
+    print_test("Prueba heap encolar clave4", heap_encolar(heap, clave4));
+    print_test("Prueba heap ver max es clave3", heap_ver_max(heap)==clave3);
+    print_test("Prueba heap encolar clave5", heap_encolar(heap, clave5));
+    print_test("Prueba heap encolar clave6", heap_encolar(heap, clave6));
+    print_test("Prueba heap encolar clave7", heap_encolar(heap, clave7));
+    print_test("Prueba heap ver max es clave6", heap_ver_max(heap)==clave6);
+
+    heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_desencolar_cadenas(){
+    heap_t* heap = heap_crear(comparar_cadenas);
+
+    char *clave4 = "cabra";
+    char *clave2 = "gato";
+    char* clave7 = "jirafa";
+    char *clave5 = "mono";
+    char *clave1 = "perro";
+    char *clave3 = "vaca";
+    char *clave6 = "zorro";
+    
+    print_test("Prueba heap encolar clave1", heap_encolar(heap, clave1));
+    print_test("Prueba heap encolar clave2", heap_encolar(heap, clave2));
+    print_test("Prueba heap desencolar es clave1", heap_desencolar(heap)==clave1);
+    print_test("Prueba heap desencolar es clave2", heap_desencolar(heap)==clave2);
+    print_test("Prueba heap desencolar es NULL", heap_desencolar(heap)==NULL);
+    print_test("Prueba heap encolar clave3", heap_encolar(heap, clave3));
+    print_test("Prueba heap encolar clave4", heap_encolar(heap, clave4));
+    print_test("Prueba heap desencolar es clave3", heap_ver_max(heap)==clave3);
+    print_test("Prueba heap encolar clave5", heap_encolar(heap, clave5));
+    print_test("Prueba heap encolar clave6", heap_encolar(heap, clave6));
+    print_test("Prueba heap desencolar es clave6", heap_desencolar(heap)==clave6);
+    print_test("Prueba heap encolar clave7", heap_encolar(heap, clave7));
+    print_test("Prueba heap desencolar es clave6", heap_ver_max(heap)==clave3);
+
+    heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_encolar_enteros(){
+    heap_t* heap = heap_crear(comparar_enteros);
+
+    int clave4 = 6;
+    int clave2 = 30;
+    int clave7 = 555;
+    int clave5 = 3244;
+    int clave1 = 3245;
+    int clave3 = 45213;
+    int clave6 = 543254;
+    
+    print_test("Prueba heap encolar clave1", heap_encolar(heap, &clave1));
+    print_test("Prueba heap encolar clave2", heap_encolar(heap, &clave2));
+    print_test("Prueba heap ver max es clave2", heap_ver_max(heap)==&clave1);
+    print_test("Prueba heap encolar clave3", heap_encolar(heap, &clave3));
+    print_test("Prueba heap encolar clave4", heap_encolar(heap, &clave4));
+    print_test("Prueba heap ver max es clave3", heap_ver_max(heap)==&clave3);
+    print_test("Prueba heap encolar clave5", heap_encolar(heap, &clave5));
+    print_test("Prueba heap encolar clave6", heap_encolar(heap, &clave6));
+    print_test("Prueba heap encolar clave7", heap_encolar(heap, &clave7));
+    print_test("Prueba heap ver max es clave6", heap_ver_max(heap)==&clave6);
+
+    heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_desencolar_enteros(){
+    heap_t* heap = heap_crear(comparar_cadenas);
+  
+    int clave4 = 6;
+    int clave2 = 30;
+    int clave7 = 555;
+    int clave5 = 3244;
+    int clave1 = 3245;
+    int clave3 = 45213;
+    int clave6 = 543254;
+    
+    print_test("Prueba heap encolar clave1", heap_encolar(heap, &clave1));
+    print_test("Prueba heap encolar clave2", heap_encolar(heap, &clave2));
+    print_test("Prueba heap desencolar es clave1", heap_desencolar(heap)==&clave1);
+    print_test("Prueba heap desencolar es clave2", heap_desencolar(heap)==&clave2);
+    print_test("Prueba heap desencolar es NULL", heap_desencolar(heap)==NULL);
+    print_test("Prueba heap encolar clave3", heap_encolar(heap, &clave3));
+    print_test("Prueba heap encolar clave4", heap_encolar(heap, &clave4));
+    print_test("Prueba heap desencolar es clave3", heap_ver_max(heap)==&clave3);
+    print_test("Prueba heap encolar clave5", heap_encolar(heap, &clave5));
+    print_test("Prueba heap encolar clave6", heap_encolar(heap, &clave6));
+    print_test("Prueba heap desencolar es clave6", heap_desencolar(heap)==&clave6);
+    print_test("Prueba heap encolar clave7", heap_encolar(heap, &clave7));
+    print_test("Prueba heap desencolar es clave6", heap_ver_max(heap)==&clave3);
+
+    heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_free_propio(){
+    heap_t* heap = heap_crear(comparar_enteros);
+  
+	int *aux,i;
+
+	for(i=0;i<100;i++){
+		aux = malloc(sizeof(int));
+		*aux = i;
+    		heap_encolar(heap,aux);
+	}
+
+    print_test("Prueba heap free propio", *(int*)(heap_ver_max(heap))== 99);
+    heap_destruir(heap,free);
+}
+
+static void prueba_heap_volumen(){
+    heap_t* heap = heap_crear(comparar_enteros);
+  
+	int i,*aux;
+
+	for(i=0;i<1000000;i++){
+		aux = malloc(sizeof(int));
+		*aux = i;
+    		heap_encolar(heap,aux);
+	}
+
+    print_test("Prueba heap 1000000 elementos", *(int*)(heap_ver_max(heap))== 999999);
+    heap_destruir(heap,free);
+}
+
+void pruebas_heap_alumno()
+{
+    /* Ejecuta todas las pruebas unitarias. */
+    prueba_crear_heap_vacio();
+    prueba_heap_encolar_cadenas();
+    prueba_heap_desencolar_cadenas();
+    prueba_heap_encolar_enteros();
+    prueba_heap_desencolar_enteros();
+    prueba_heap_free_propio();
+    prueba_heap_volumen();
+
+    if(!failure_count())
+        printf("Se finalizaron todas las pruebas sin errores\n");
+}
