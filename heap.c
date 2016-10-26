@@ -31,7 +31,6 @@ heap_t *heap_crear(cmp_func_t cmp){
 	if(!heap)
 		return NULL;
 
-	//heap->array = malloc(sizeof(char*)*CANTIDAD_INICIAL);
 	heap -> arreglo = malloc(sizeof(void*)*TAM_INICIAL);
 
 	if(!heap->arreglo){
@@ -51,14 +50,6 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 	heap_t *heap = heap_crear(cmp);
 	
 	for(size_t i=0;i<n;i++){	
-
-		//if((double)heap->cantidad >= ((double)heap->capacidad*FACTOR_DE_CARGA))//Podemos meter esto en la funcion redimensionar,
-			//llamarla siempre para no repetir codigo y que ella decida si agrandar, achicar o no hacer nada
-			//(Correcion de Martin)
-		//	heap_redimensionar(heap,heap->capacidad*INCREMENTO_CAPACIDAD); //podria validar
-
-		//heap->arreglo[i] = arreglo[i];// Si hacemos esto el heap queda con el mismo orden que el arreglo
-		//heap->cantidad ++;	
 		heap_encolar(heap, arreglo[i]);
 	}
 		
