@@ -157,10 +157,10 @@ void downheap(heap_t *heap,size_t posicion){
 	if(pos_h_der < heap->cantidad && heap->arreglo[pos_mayor] < heap->arreglo[pos_h_der])
 		pos_mayor - pos_h_der;
 
-	if(pos_mayor != posicion)
+	if(pos_mayor != posicion){
 		swap(heap->arreglo[posicion],heap->arreglo[pos_mayor])
-
-	downheap(heap,pos_mayor);
+		downheap(heap,pos_mayor);
+	}
 }
 
 
@@ -172,8 +172,8 @@ void upheap(heap_t *heap,size_t posicion){
 
 	pos_padre = (posicion-1)/2;
 
-	if(heap->arreglo[posicion]>heap->arreglo[pos_padre])
+	if(heap->arreglo[posicion]>heap->arreglo[pos_padre]){
 		swap(heap->arreglo[posicion],heap->arreglo[pos_padre]);
-
-	upheap(heap,pos_padre);
+		upheap(heap,pos_padre);
+	}
 }
