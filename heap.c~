@@ -133,10 +133,7 @@ bool heap_encolar(heap_t *heap,void *elemento){
 
 void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
 	
-	if(!heap)
-		return;
-
-	if(heap->cantidad){
+	if(!heap || heap->cantidad){
 		if(destruir_elemento){
 			for(unsigned int i=0;i<heap->cantidad;i++){
 				destruir_elemento(heap->arreglo);
