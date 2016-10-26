@@ -43,15 +43,15 @@ static void prueba_heap_encolar_cadenas(){
     char *clave3 = "vaca";
     char *clave6 = "zorro";
     
-    print_test("Prueba heap encolar clave1", heap_encolar(heap, clave1));
-    print_test("Prueba heap encolar clave2", heap_encolar(heap, clave2));
+    print_test("Prueba heap encolar cadenas clave1", heap_encolar(heap, clave1));
+    print_test("Prueba heap encolar cadenas clave2", heap_encolar(heap, clave2));
     print_test("Prueba heap ver max es clave2", heap_ver_max(heap)==clave1);
-    print_test("Prueba heap encolar clave3", heap_encolar(heap, clave3));
-    print_test("Prueba heap encolar clave4", heap_encolar(heap, clave4));
+    print_test("Prueba heap encolar cadenas clave3", heap_encolar(heap, clave3));
+    print_test("Prueba heap encolar cadenas clave4", heap_encolar(heap, clave4));
     print_test("Prueba heap ver max es clave3", heap_ver_max(heap)==clave3);
-    print_test("Prueba heap encolar clave5", heap_encolar(heap, clave5));
-    print_test("Prueba heap encolar clave6", heap_encolar(heap, clave6));
-    print_test("Prueba heap encolar clave7", heap_encolar(heap, clave7));
+    print_test("Prueba heap encolar cadenas clave5", heap_encolar(heap, clave5));
+    print_test("Prueba heap encolar cadenas clave6", heap_encolar(heap, clave6));
+    print_test("Prueba heap encolar cadenas clave7", heap_encolar(heap, clave7));
     print_test("Prueba heap ver max es clave6", heap_ver_max(heap)==clave6);
 
     heap_destruir(heap,NULL);
@@ -68,17 +68,17 @@ static void prueba_heap_desencolar_cadenas(){
     char *clave3 = "vaca";
     char *clave6 = "zorro";
     
-    print_test("Prueba heap encolar clave1", heap_encolar(heap, clave1));
-    print_test("Prueba heap encolar clave2", heap_encolar(heap, clave2));
-    print_test("Prueba heap desencolar es clave1", heap_desencolar(heap)==clave1);
-    print_test("Prueba heap desencolar es clave2", heap_desencolar(heap)==clave2);
-    print_test("Prueba heap desencolar es NULL", heap_desencolar(heap)==NULL);
-    print_test("Prueba heap encolar clave3", heap_encolar(heap, clave3));
-    print_test("Prueba heap encolar clave4", heap_encolar(heap, clave4));
-    print_test("Prueba heap desencolar es clave3", heap_ver_max(heap)==clave3);
-    print_test("Prueba heap encolar clave5", heap_encolar(heap, clave5));
-    print_test("Prueba heap encolar clave6", heap_encolar(heap, clave6));
-    print_test("Prueba heap desencolar es clave6", heap_desencolar(heap)==clave6);
+    print_test("Prueba heap encolar cadenas clave1", heap_encolar(heap, clave1));
+    print_test("Prueba heap encolar cadenas clave2", heap_encolar(heap, clave2));
+    print_test("Prueba heap desencolar cadenas es clave1", heap_desencolar(heap)==clave1);
+    print_test("Prueba heap desencolar cadenas es clave2", heap_desencolar(heap)==clave2);
+    print_test("Prueba heap desencolar cadenas es NULL", heap_desencolar(heap)==NULL);
+    print_test("Prueba heap encolar cadenas clave3", heap_encolar(heap, clave3));
+    print_test("Prueba heap encolar cadenas clave4", heap_encolar(heap, clave4));
+    print_test("Prueba heap desencolar cadenas es clave3", heap_ver_max(heap)==clave3);
+    print_test("Prueba heap encolar cadenas clave5", heap_encolar(heap, clave5));
+    print_test("Prueba heap encolar cadenas clave6", heap_encolar(heap, clave6));
+    print_test("Prueba heap desencolar cadenas es clave6", heap_desencolar(heap)==clave6);
     print_test("Prueba heap encolar clave7", heap_encolar(heap, clave7));
     print_test("Prueba heap desencolar es clave6", heap_ver_max(heap)==clave3);
 
@@ -96,22 +96,22 @@ static void prueba_heap_encolar_enteros(){
     int clave3 = 45213;
     int clave6 = 543254;
     
-    print_test("Prueba heap encolar clave1", heap_encolar(heap, &clave1));
-    print_test("Prueba heap encolar clave2", heap_encolar(heap, &clave2));
+    print_test("Prueba heap encolar enteros clave1", heap_encolar(heap, &clave1));
+    print_test("Prueba heap encolar enteros clave2", heap_encolar(heap, &clave2));
     print_test("Prueba heap ver max es clave2", heap_ver_max(heap)==&clave1);
-    print_test("Prueba heap encolar clave3", heap_encolar(heap, &clave3));
-    print_test("Prueba heap encolar clave4", heap_encolar(heap, &clave4));
+    print_test("Prueba heap encolar enteros clave3", heap_encolar(heap, &clave3));
+    print_test("Prueba heap encolar enteros clave4", heap_encolar(heap, &clave4));
     print_test("Prueba heap ver max es clave3", heap_ver_max(heap)==&clave3);
-    print_test("Prueba heap encolar clave5", heap_encolar(heap, &clave5));
-    print_test("Prueba heap encolar clave6", heap_encolar(heap, &clave6));
-    print_test("Prueba heap encolar clave7", heap_encolar(heap, &clave7));
+    print_test("Prueba heap encolar enteros clave5", heap_encolar(heap, &clave5));
+    print_test("Prueba heap encolar enteros clave6", heap_encolar(heap, &clave6));
+    print_test("Prueba heap encolar enteros clave7", heap_encolar(heap, &clave7));
     print_test("Prueba heap ver max es clave6", heap_ver_max(heap)==&clave6);
 
     heap_destruir(heap,NULL);
 }
 
 static void prueba_heap_desencolar_enteros(){
-    heap_t* heap = heap_crear(comparar_cadenas);
+    heap_t* heap = heap_crear(comparar_enteros);
   
     int clave4 = 6;
     int clave2 = 30;
@@ -121,19 +121,19 @@ static void prueba_heap_desencolar_enteros(){
     int clave3 = 45213;
     int clave6 = 543254;
     
-    print_test("Prueba heap encolar clave1", heap_encolar(heap, &clave1));
-    print_test("Prueba heap encolar clave2", heap_encolar(heap, &clave2));
-    print_test("Prueba heap desencolar es clave1", heap_desencolar(heap)==&clave1);
-    print_test("Prueba heap desencolar es clave2", heap_desencolar(heap)==&clave2);
-    print_test("Prueba heap desencolar es NULL", heap_desencolar(heap)==NULL);
-    print_test("Prueba heap encolar clave3", heap_encolar(heap, &clave3));
-    print_test("Prueba heap encolar clave4", heap_encolar(heap, &clave4));
-    print_test("Prueba heap desencolar es clave3", heap_ver_max(heap)==&clave3);
-    print_test("Prueba heap encolar clave5", heap_encolar(heap, &clave5));
-    print_test("Prueba heap encolar clave6", heap_encolar(heap, &clave6));
-    print_test("Prueba heap desencolar es clave6", heap_desencolar(heap)==&clave6);
-    print_test("Prueba heap encolar clave7", heap_encolar(heap, &clave7));
-    print_test("Prueba heap desencolar es clave6", heap_ver_max(heap)==&clave3);
+    print_test("Prueba heap encolar enteros clave1", heap_encolar(heap, &clave1));
+    print_test("Prueba heap encolar enteros clave2", heap_encolar(heap, &clave2));
+    print_test("Prueba heap desencolar enteros es clave1", heap_desencolar(heap)==&clave1);
+    print_test("Prueba heap desencolar enteros es clave2", heap_desencolar(heap)==&clave2);
+    print_test("Prueba heap desencolar enteros es NULL", heap_desencolar(heap)==NULL);
+    print_test("Prueba heap encolar enteros clave3", heap_encolar(heap, &clave3));
+    print_test("Prueba heap encolar enteros clave4", heap_encolar(heap, &clave4));
+    print_test("Prueba heap desencolar enteros es clave3", heap_ver_max(heap)==&clave3);
+    print_test("Prueba heap encolar enteros clave5", heap_encolar(heap, &clave5));
+    print_test("Prueba heap encolar enteros clave6", heap_encolar(heap, &clave6));
+    print_test("Prueba heap desencolar enteros es clave6", heap_desencolar(heap)==&clave6);
+    print_test("Prueba heap encolar enteros clave7", heap_encolar(heap, &clave7));
+    print_test("Prueba heap desencolar enteros es clave6", heap_ver_max(heap)==&clave3);
 
     heap_destruir(heap,NULL);
 }
@@ -163,7 +163,7 @@ static void prueba_heap_volumen(){
 		*aux = i;
     		heap_encolar(heap,aux);
 	}
-
+	
     print_test("Prueba heap 1000000 elementos", *(int*)(heap_ver_max(heap))== 999999);
     heap_destruir(heap,free);
 }
