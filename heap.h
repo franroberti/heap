@@ -49,7 +49,8 @@ heap_t *heap_crear(cmp_func_t cmp);
 */
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp);
 
-/* Elimina el heap, llamando a la función dada para cada elemento del mismo.
+/* Elimina el heap, llamando a la función dada para 
+>?cada elemento del mismo.
  * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
  * Post: se llamó a la función indicada con cada elemento del heap. El heap
  * dejó de ser válido. */

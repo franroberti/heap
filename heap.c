@@ -11,7 +11,7 @@
 
 struct heap{
 	//char *array[];
-	void* arreglo;
+	void* arreglo[];
 	size_t cantidad;
 	size_t capacidad;
 	cmp_func_t cmp;
@@ -85,7 +85,7 @@ void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
 }
 
 bool heap_redimensionar(heap_t *heap,size_t nueva_dim){
-	void *aux_array;
+	void *aux_array[];
 	//Falta definir un heap_aux
 	if(!heap_aux)
 		return false;
@@ -154,13 +154,38 @@ void *heap_desencolar(heap){
 	return aux;
 }
 
-void heapify(heap_t *heap){
-	for(size_t i = (cantidad/2)-1;i>=0;i--){//////Ver si no es i= (cantidad-1)/2
-		downheap(heap,i);
+void heapsort(void *elementos[], size_t cant, cmp_func_t cmp){
+	for(size_t i = (cant-1)/2-1;i>=0;i--){
+		downheap(elementos,cant,i,cmp);
 	}
 }
 
-//podrian recibir el arreglo down y up heap, y heapify lo mismo
+void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp){
+	size_t pos_h_izq, pos_h_der, pos_mayor;
+
+	if(posicion >= cant){
+		return;
+	}
+
+	pos_h_izq = posicion*2 + 1;
+	pos_h_der = posicion*2 + 2;
+	pos_mayor = posicion;
+
+	if(pos_h_izq < heap -> cantidad && cmp(elementos[posicion],elementos[pos_h_izq]) <0)
+		pos_mayor = pos_h_izq;
+
+	if(pos_h_der < heap -> cantidad && cmp(elementos[pos_mayor],elementos[pos_h_der]) <0)
+		pos_mayor = pos_h_der;
+
+	if(pos_mayor != posicion){
+		swap(elementos, posicion, pos_mayor);
+		downheap(elementos,cant,pos_mayor,cmp);
+	}
+
+}
+
+
+/*//podrian recibir el arreglo down y up heap, y heapify lo mismo
 void downheap(heap_t *heap,size_t posicion){
 	size_t pos_h_izq,pos_h_der,pos_mayor;
 	
@@ -182,9 +207,9 @@ void downheap(heap_t *heap,size_t posicion){
 		swap(heap->arreglo[posicion],heap->arreglo[pos_mayor]);
 		downheap(heap,pos_mayor);
 	}
-}
+}*/
 
-void upheap(heap_t *heap,size_t posicion){
+void upheap(void *elementos[], size_t posicion, cmp_func_t cmp){
 	size_t pos_padre;
 
 	if(!posicion)
@@ -192,8 +217,8 @@ void upheap(heap_t *heap,size_t posicion){
 
 	pos_padre = (posicion-1)/2;
 
-	if(heap->arreglo[posicion]>heap->arreglo[pos_padre]){
-		swap(heap->arreglo[posicion],heap->arreglo[pos_padre]);
-		upheap(heap,pos_padre);
+	if(cmp(elementos[posicion]elementos[pos_padre]))>0{
+		swap(elementos,posicion,pos_padre);
+		upheap(elementos,pos_padre,cmp);
 	}
 }
