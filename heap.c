@@ -66,7 +66,7 @@ void *heap_ver_max(const heap_t *heap){
 	if(!heap->cantidad || !heap)
 		return NULL;
 
-	return heap->arreglo[0];
+	return (void*)heap->arreglo[0];
 }
 
 bool heap_redimensionar(heap_t *heap){
@@ -136,10 +136,11 @@ void *heap_desencolar(heap_t* heap){
 	return aux;
 }
 
-void heapsort(void *elementos[], size_t cant, cmp_func_t cmp){
-	for(int i = (int)(cant-1)/2-1;i>=0;i--){
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+	for(int i = (int)(cant/2)-1;i>=0;i--){
 		downheap(elementos,cant,i,cmp);
 	}
+
 }
 
 void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp){
