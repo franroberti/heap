@@ -154,7 +154,7 @@ static void prueba_heap_free_propio(){
 	}
 
     print_test("Prueba heap free propio", *(int*)(heap_ver_max(heap))== 99);
-    heap_destruir(heap,free);
+    heap_destruir(heap,free);	
 }
 //Encola en volumen, 
 static void prueba_heap_volumen(int tam){
@@ -220,19 +220,16 @@ static void prueba_heap_sort(size_t tam){
 	} 	
 	
 	heap_sort(arreglo,tam,comparar_enteros);
-
-	bool ok=true;
-	for(int i = 0;i>=(int)tam-2;i++){
-		if(arreglo[i] > arreglo[i+1]){
-
-		ok = false;
-		break;
-		}
-		
 	
+	bool ok=true;
+	for(int i = 0;i<=(int)tam-2;i++){
+		if(comparar_enteros(arreglo[i],arreglo[i+1])>0){
+			ok = false;
+			break;
+		}
 	}
-	print_test("Prueba orden de arreglo prueba_heap_sort",ok);
 
+	print_test("Prueba orden de arreglo prueba_heap_sort",ok);
 	
 
 	for(int i = 0;i<(int)tam;i++){
@@ -244,6 +241,43 @@ static void prueba_heap_sort(size_t tam){
 }
 
 
+
+void prueba_heap_sort_2(){
+	size_t tam = 3;
+	void** arreglo = malloc(sizeof(int*)*tam);
+
+	int* a = malloc(sizeof(int));
+	int* b = malloc(sizeof(int));
+	int* c = malloc(sizeof(int));
+
+	*a = 20;
+	*b = 300;
+	*c = 4000;
+
+	arreglo[1]=a;
+	arreglo[2]=b;
+	arreglo[0]=c;
+
+	heap_sort(arreglo,tam,comparar_enteros);
+
+	print_test("Prueba heap_sort, ver pos 0 es a", arreglo[0]==a);
+	print_test("Prueba heap_sort, ver pos 1 es b", arreglo[1]==b);
+	print_test("Prueba heap_sort, ver pos 2 es c", arreglo[2]==c);
+
+	heap_sort(arreglo,tam,comparar_enteros);
+
+	bool ok=true;
+	if(arreglo[0]!=a || arreglo[1] != b || arreglo[2]!=c) ok = false;
+	print_test("Prueba heap_sort en un arreglo ordenado",ok);
+	
+
+	for(int i = 0;i<(int)tam;i++){
+		free(arreglo[i]);
+	}
+	free(arreglo);
+
+
+}
 void prueba_heap_encolar_memoria_dinamica(){
 	heap_t* heap = heap_crear(comparar_enteros);
 
@@ -275,7 +309,8 @@ void pruebas_heap_alumno()
     prueba_heap_free_propio();
     prueba_heap_volumen(5000);
     prueba_heapify(5000);
-   	prueba_heap_sort(2000);
+    prueba_heap_sort(100);
+    prueba_heap_sort_2(1000);
    	prueba_heap_encolar_memoria_dinamica();
 
     if(!failure_count())

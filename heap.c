@@ -14,6 +14,7 @@ bool heap_redimensionar(heap_t *heap);
 void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp);
 void upheap(void *elementos[], size_t posicion, cmp_func_t cmp);
 void swap(void* elementos[], size_t pos1, size_t pos2);
+void _heap_sort(void* elementos[],size_t cant,cmp_func_t cmp);
 
 struct heap{
 	void** arreglo;
@@ -137,11 +138,18 @@ void *heap_desencolar(heap_t* heap){
 }
 
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
-	for(int i = (int)(cant/2)-1;i>=0;i--){
+	for(int i = (int)(cant-1)/2;i>=0;i--){
 		downheap(elementos,cant,i,cmp);
+	}
+	
+	for(int i = (int)cant-1;i>0;i--){
+		swap(elementos,0,i);
+		downheap(elementos,i,0,cmp);
 	}
 
 }
+
+
 
 void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp){
 	size_t pos_h_izq, pos_h_der, pos_mayor;
