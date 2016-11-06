@@ -2,19 +2,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 #define TAM_INICIAL 20
-//redim
-#define FACTOR_DE_CARGA_MAX 0.7
-#define FACTOR_DE_CARGA_MIN 0.15
-#define INCREMENTO_CAPACIDAD 2
-#define DECREMENTO_CAPACIDAD 2
+#define INCREMENTO_TAM 2
+#define DECREMENTO_TAM 4
 
-bool heap_redimensionar(heap_t *heap);
+bool heap_redimensionar(heap_t *heap,size_t tam);
 void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp);
 void upheap(void *elementos[], size_t posicion, cmp_func_t cmp);
 void swap(void* elementos[], size_t pos1, size_t pos2);
 void _heap_sort(void* elementos[],size_t cant,cmp_func_t cmp);
+void heapify(void* elementos[], size_t cant, cmp_func_t cmp);
 
 struct heap{
 	void** arreglo;
@@ -46,15 +45,19 @@ heap_t *heap_crear(cmp_func_t cmp){
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 	
-	heap_t *heap = heap_crear(cmp);
-	
-	for(size_t i=0;i<n;i++){	
-		heap_encolar(heap, arreglo[i]);
-	}
-		
+	heapify(arreglo,n,cmp);
+
+	heap_t* heap = heap_crear(cmp);
+	free(heap->arreglo);
+
+	heap -> arreglo = arreglo;
+	heap->cantidad = n;
+	heap->capacidad = n;
+
 	return heap;
 
 }
+
 size_t heap_cantidad(const heap_t *heap){
 	return heap->cantidad;
 }
@@ -67,23 +70,15 @@ void *heap_ver_max(const heap_t *heap){
 	if(!heap->cantidad || !heap)
 		return NULL;
 
-	return (void*)heap->arreglo[0];
+	return heap->arreglo[0];
 }
 
-bool heap_redimensionar(heap_t *heap){
-	double fc = (double)(heap->cantidad)/((double)heap->capacidad);
+bool heap_redimensionar(heap_t *heap,size_t tam){
 
-	if((fc>=FACTOR_DE_CARGA_MAX)||((fc<=FACTOR_DE_CARGA_MIN) && (heap->capacidad > TAM_INICIAL))){
-		size_t tam;
-		if(fc>=FACTOR_DE_CARGA_MAX) tam = heap->capacidad*INCREMENTO_CAPACIDAD;
-
-		else tam = heap->capacidad/DECREMENTO_CAPACIDAD;
-
-		void* aux_array = realloc(heap->arreglo,sizeof(void*)*tam);
-		if(!aux_array) return false;
-		heap->arreglo = aux_array;
-		heap->capacidad = tam;
-	}
+	void* aux_array = realloc(heap->arreglo,sizeof(void*)*tam);
+	if(!aux_array) return false;
+	heap->arreglo = aux_array;
+	heap->capacidad = tam;
 
 	return true;
 }
@@ -92,13 +87,15 @@ bool heap_encolar(heap_t *heap,void *elemento){
 	
 	if(!heap || !elemento)
 		return false;
-		
+	
+
 	heap->arreglo[heap->cantidad] = elemento;
 	upheap(heap->arreglo, heap->cantidad, heap->cmp);
 	heap->cantidad ++;
 
-	if(!heap_redimensionar(heap)) return false;
-	
+	if(heap->cantidad == heap->capacidad){
+		return heap_redimensionar(heap, heap->capacidad * INCREMENTO_TAM);
+	}
 	
 	return true;
 }
@@ -108,13 +105,13 @@ void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
 	if(!heap)
 		return;
 
-	if(heap->cantidad){
-		if(destruir_elemento){
-			for(size_t i=0;i<heap->cantidad;i++){
-				destruir_elemento(heap->arreglo[i]);
-			}
+	
+	if(destruir_elemento){
+		for(size_t i=0;i<heap->cantidad;i++){
+			destruir_elemento(heap->arreglo[i]);
 		}
 	}
+	
 	free(heap->arreglo);
 	free(heap);
 
@@ -133,15 +130,27 @@ void *heap_desencolar(heap_t* heap){
 	downheap(heap->arreglo,heap->cantidad,0,heap->cmp);
 	
 	heap->cantidad --;
-	if(!heap_redimensionar(heap)) return false;
+	
+	size_t carga_min = heap->capacidad/4;
+
+	if(heap -> cantidad < carga_min && heap -> cantidad > TAM_INICIAL){
+		heap_redimensionar(heap,heap -> capacidad /DECREMENTO_TAM);
+	}
+
 	return aux;
 }
 
-void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+
+void heapify(void* elementos[], size_t cant, cmp_func_t cmp){
 	for(int i = (int)(cant-1)/2;i>=0;i--){
 		downheap(elementos,cant,i,cmp);
 	}
 	
+}
+
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+	heapify(elementos,cant,cmp);
+
 	for(int i = (int)cant-1;i>0;i--){
 		swap(elementos,0,i);
 		downheap(elementos,i,0,cmp);

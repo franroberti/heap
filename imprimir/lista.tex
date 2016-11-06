@@ -1,0 +1,597 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,activeacute]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{listings}
+\usepackage{color}
+\definecolor{gray97}{gray}{.97}
+\definecolor{gray75}{gray}{.75}
+\definecolor{gray45}{gray}{.45}
+\author{Mariano Gim\'enez  - 99789  - Franco Roberti  - 97463}
+\title{Heap}
+\date{Corrector: Martin Buchwald}
+
+\begin{document}
+\maketitle 
+
+\lstset{ frame=Ltb,
+     framerule=0pt,
+     aboveskip=0.5cm,
+     framextopmargin=3pt,
+     framexbottommargin=3pt,
+     framexleftmargin=0.4cm,
+     framesep=0pt,
+     rulesep=.4pt,
+     backgroundcolor=\color{white},
+     rulesepcolor=\color{black},
+     %
+     stringstyle=\ttfamily,
+     showstringspaces = false,
+     basicstyle=\small\ttfamily,
+     commentstyle=\color{gray45},
+     keywordstyle=\bfseries,
+     %
+     numbers=left,
+     numbersep=15pt,
+     numberstyle=\tiny,
+     numberfirstline = false,
+     breaklines=false,
+   }
+ 
+% minimizar fragmentado de listados
+\lstnewenvironment{listing}[1][]
+   {\lstset{#1}\pagebreak[0]}{\pagebreak[0]}
+ 
+ 
+\lstdefinestyle{c}
+   {language=c,
+   }
+
+\section{C\'odigo fuente:}
+\subsection{Heap.c}
+
+\begin{lstlisting}[style= c]
+#include "heap.h"
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+#define TAM_INICIAL 20
+//redim
+#define FACTOR_DE_CARGA_MAX 0.7
+#define FACTOR_DE_CARGA_MIN 0.15
+#define INCREMENTO_CAPACIDAD 2
+#define DECREMENTO_CAPACIDAD 2
+
+bool heap_redimensionar(heap_t *heap);
+void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp);
+void upheap(void *elementos[], size_t posicion, cmp_func_t cmp);
+void swap(void* elementos[], size_t pos1, size_t pos2);
+void _heap_sort(void* elementos[],size_t cant,cmp_func_t cmp);
+
+struct heap{
+	void** arreglo;
+	size_t cantidad;
+	size_t capacidad;
+	cmp_func_t cmp;
+
+};
+
+heap_t *heap_crear(cmp_func_t cmp){
+	
+	heap_t *heap = malloc(sizeof(heap_t));
+	
+	if(!heap)
+		return NULL;
+	heap -> arreglo = malloc(sizeof(void*)*TAM_INICIAL);
+
+	if(!heap->arreglo){
+		free(heap);
+		return NULL;
+	}
+
+	heap->cantidad = 0;
+	heap->capacidad = TAM_INICIAL;
+	heap->cmp = cmp;
+
+	return heap;
+}
+
+heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
+	
+	heap_t *heap = heap_crear(cmp);
+	
+	for(size_t i=0;i<n;i++){	
+		heap_encolar(heap, arreglo[i]);
+	}
+		
+	return heap;
+
+}
+size_t heap_cantidad(const heap_t *heap){
+	return heap->cantidad;
+}
+
+bool heap_esta_vacio(const heap_t *heap){
+	return heap->cantidad == 0;
+}
+
+void *heap_ver_max(const heap_t *heap){
+	if(!heap->cantidad || !heap)
+		return NULL;
+
+	return (void*)heap->arreglo[0];
+}
+
+bool heap_redimensionar(heap_t *heap){
+	double fc = (double)(heap->cantidad)/((double)heap->capacidad);
+
+	if((fc>=FACTOR_DE_CARGA_MAX)||((fc<=FACTOR_DE_CARGA_MIN) && 
+    (heap->capacidad > TAM_INICIAL))){
+
+		size_t tam;
+		if(fc>=FACTOR_DE_CARGA_MAX) tam = heap->capacidad*INCREMENTO_CAPACIDAD;
+
+		else tam = heap->capacidad/DECREMENTO_CAPACIDAD;
+
+		void* aux_array = realloc(heap->arreglo,sizeof(void*)*tam);
+		if(!aux_array) return false;
+		heap->arreglo = aux_array;
+		heap->capacidad = tam;
+	}
+
+	return true;
+}
+
+bool heap_encolar(heap_t *heap,void *elemento){
+	
+	if(!heap || !elemento)
+		return false;
+		
+	heap->arreglo[heap->cantidad] = elemento;
+	upheap(heap->arreglo, heap->cantidad, heap->cmp);
+	heap->cantidad ++;
+
+	if(!heap_redimensionar(heap)) return false;
+	
+	
+	return true;
+}
+
+void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
+	
+	if(!heap)
+		return;
+
+	if(heap->cantidad){
+		if(destruir_elemento){
+			for(size_t i=0;i<heap->cantidad;i++){
+				destruir_elemento(heap->arreglo[i]);
+			}
+		}
+	}
+	free(heap->arreglo);
+	free(heap);
+
+}
+
+void *heap_desencolar(heap_t* heap){
+	
+	void *aux;
+
+	if(!heap || !heap->cantidad)
+		return NULL;
+
+	aux = heap->arreglo[0];
+	heap->arreglo[0] = heap->arreglo[heap->cantidad-1];	
+
+	downheap(heap->arreglo,heap->cantidad,0,heap->cmp);
+	
+	heap->cantidad --;
+	if(!heap_redimensionar(heap)) return false;
+	return aux;
+}
+
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+	for(int i = (int)(cant-1)/2;i>=0;i--){
+		downheap(elementos,cant,i,cmp);
+	}
+	
+	for(int i = (int)cant-1;i>0;i--){
+		swap(elementos,0,i);
+		downheap(elementos,i,0,cmp);
+	}
+
+}
+
+
+
+void downheap(void *elementos[],size_t cant, size_t posicion, cmp_func_t cmp){
+	size_t pos_h_izq, pos_h_der, pos_mayor;
+
+	if(posicion >= cant){
+		return;
+	}
+
+	pos_h_izq = posicion*2 + 1;
+	pos_h_der = posicion*2 + 2;
+	pos_mayor = posicion;
+
+	if(pos_h_izq < cant && cmp(elementos[posicion],elementos[pos_h_izq]) <0)
+		pos_mayor = pos_h_izq;
+
+	if(pos_h_der < cant && cmp(elementos[pos_mayor],elementos[pos_h_der]) <0)
+		pos_mayor = pos_h_der;
+
+	if(pos_mayor != posicion){
+		swap(elementos, posicion, pos_mayor);
+		downheap(elementos,cant,pos_mayor,cmp);
+	}
+
+}
+
+
+void upheap(void *elementos[], size_t posicion, cmp_func_t cmp){
+	size_t pos_padre;
+
+	if(!posicion)
+		return;
+
+	pos_padre = (posicion-1)/2;
+
+	if(cmp(elementos[posicion],elementos[pos_padre])>0){
+		swap(elementos,posicion,pos_padre);
+		upheap(elementos,pos_padre,cmp);
+	}
+}
+
+void swap(void* elementos[], size_t pos1, size_t pos2){
+	void* aux = elementos[pos1];
+	elementos[pos1] = elementos[pos2];
+	elementos[pos2] = aux;
+}
+
+\end{lstlisting}
+\newpage
+ \subsection{pruebas\_alumno.c}
+\begin{lstlisting}[style= c]
+#include "heap.h"
+#include "testing.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>  // For ssize_t in Linux.
+
+
+int comparar_cadenas(const void* a, const void*b){
+    return strcmp((char*)a,(char*)b);
+}
+
+int comparar_enteros(const void* a, const void*b){
+	if(*(int*)a > *(int*)b)
+		return 1;
+	if(*(int*)a < *(int*)b)
+		return -1;
+
+	return 0;
+}
+
+static void prueba_crear_heap_vacio()
+{
+  heap_t* heap = heap_crear(comparar_cadenas);
+
+  print_test("Prueba crear heap vacio", heap);
+  print_test("Prueba heap la cantidad de elementos es 0", heap_cantidad(heap) == 0);
+  print_test("Prueba heap esta vacio", heap_esta_vacio(heap));
+  print_test("Prueba heap ver maximo es NULL", !heap_ver_max(heap));
+  print_test("Prueba heap desencolar es NULL", !heap_desencolar(heap));
+
+  heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_encolar_cadenas(){
+  heap_t* heap = heap_crear(comparar_cadenas);
+
+  char *clave4 = "cabra";
+  char *clave2 = "gato";
+  char* clave7 = "jirafa";
+  char *clave5 = "mono";
+  char *clave1 = "perro";
+  char *clave3 = "vaca";
+  char *clave6 = "zorro";
+  
+  print_test("Prueba heap encolar cadenas clave1", heap_encolar(heap, clave1));
+  print_test("Prueba heap encolar cadenas clave2", heap_encolar(heap, clave2));
+  print_test("Prueba heap ver max es clave2", heap_ver_max(heap)==clave1);
+  print_test("Prueba heap encolar cadenas clave3", heap_encolar(heap, clave3));
+  print_test("Prueba heap encolar cadenas clave4", heap_encolar(heap, clave4));
+  print_test("Prueba heap la cantidad de elementos es 4", heap_cantidad(heap) == 4);
+  print_test("Prueba heap ver max es clave3", heap_ver_max(heap)==clave3);
+  print_test("Prueba heap encolar cadenas clave5", heap_encolar(heap, clave5));
+  print_test("Prueba heap encolar cadenas clave6", heap_encolar(heap, clave6));
+  print_test("Prueba heap encolar cadenas clave7", heap_encolar(heap, clave7));
+  print_test("Prueba heap la cantidad de elementos es 7", heap_cantidad(heap) == 7);
+  print_test("Prueba heap ver max es clave6", heap_ver_max(heap)==clave6);
+
+  heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_desencolar_cadenas(){
+  heap_t* heap = heap_crear(comparar_cadenas);
+
+  char *clave4 = "cabra";
+  char *clave2 = "gato";
+  char* clave7 = "jirafa";
+  char *clave5 = "mono";
+  char *clave1 = "perro";
+  char *clave3 = "vaca";
+  char *clave6 = "zorro";
+  
+  print_test("Prueba heap encolar cadenas clave1", heap_encolar(heap, clave1));
+  print_test("Prueba heap encolar cadenas clave2", heap_encolar(heap, clave2));
+  print_test("Prueba heap la cantidad de elementos es 2", 
+    heap_cantidad(heap) == 2);
+  print_test("Prueba heap desencolar cadenas es clave1", 
+    heap_desencolar(heap)==clave1);
+  print_test("Prueba heap desencolar cadenas es clave2", 
+    heap_desencolar(heap)==clave2);
+  print_test("Prueba heap desencolar cadenas es NULL",
+   heap_desencolar(heap)==NULL);
+  print_test("Prueba heap la cantidad de elementos es 0", 
+    heap_cantidad(heap) == 0);
+  print_test("Prueba heap encolar cadenas clave3", heap_encolar(heap, clave3));
+  print_test("Prueba heap encolar cadenas clave4", heap_encolar(heap, clave4));
+  print_test("Prueba heap ver max es es clave3", heap_ver_max(heap)==clave3);
+  print_test("Prueba heap encolar cadenas clave5", heap_encolar(heap, clave5));
+  print_test("Prueba heap encolar cadenas clave6", heap_encolar(heap, clave6));
+  print_test("Prueba heap desencolar cadenas es clave6", 
+    heap_desencolar(heap)==clave6);
+  print_test("Prueba heap encolar clave7", heap_encolar(heap, clave7));
+  print_test("Prueba heap desencolar es clave6", heap_ver_max(heap)==clave3);
+
+  heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_encolar_enteros(){
+  heap_t* heap = heap_crear(comparar_enteros);
+
+  int clave4 = 6;
+  int clave2 = 30;
+  int clave7 = 555;
+  int clave5 = 3244;
+  int clave1 = 3245;
+  int clave3 = 45213;
+  int clave6 = 543254;
+  
+  print_test("Prueba heap encolar enteros clave1", heap_encolar(heap, &clave1));
+  print_test("Prueba heap encolar enteros clave2", heap_encolar(heap, &clave2));
+  print_test("Prueba heap ver max es clave2", heap_ver_max(heap)==&clave1);
+  print_test("Prueba heap encolar enteros clave3", heap_encolar(heap, &clave3));
+  print_test("Prueba heap encolar enteros clave4", heap_encolar(heap, &clave4));
+  print_test("Prueba heap ver max es clave3", heap_ver_max(heap)==&clave3);
+  print_test("Prueba heap encolar enteros clave5", heap_encolar(heap, &clave5));
+  print_test("Prueba heap encolar enteros clave6", heap_encolar(heap, &clave6));
+  print_test("Prueba heap encolar enteros clave7", heap_encolar(heap, &clave7));
+  print_test("Prueba heap ver max es clave6", heap_ver_max(heap)==&clave6);
+
+  heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_desencolar_enteros(){
+  heap_t* heap = heap_crear(comparar_enteros);
+
+  int clave4 = 6;
+  int clave2 = 30;
+  int clave7 = 555;
+  int clave5 = 3244;
+  int clave1 = 3245;
+  int clave3 = 45213;
+  int clave6 = 543254;
+  
+  print_test("Prueba heap encolar enteros clave1", heap_encolar(heap, &clave1));
+  print_test("Prueba heap encolar enteros clave2", heap_encolar(heap, &clave2));
+  print_test("Prueba heap desencolar enteros es clave1", 
+    heap_desencolar(heap)==&clave1);
+  print_test("Prueba heap desencolar enteros es clave2", 
+    heap_desencolar(heap)==&clave2);
+  print_test("Prueba heap desencolar enteros es NULL", heap_desencolar(heap)==NULL);
+  print_test("Prueba heap encolar enteros clave3", heap_encolar(heap, &clave3));
+  print_test("Prueba heap encolar enteros clave4", heap_encolar(heap, &clave4));
+  print_test("Prueba heap desencolar enteros es clave3", 
+    heap_ver_max(heap)==&clave3);
+  print_test("Prueba heap encolar enteros clave5", heap_encolar(heap, &clave5));
+  print_test("Prueba heap encolar enteros clave6", heap_encolar(heap, &clave6));
+  print_test("Prueba heap desencolar enteros es clave6", 
+    heap_desencolar(heap)==&clave6);
+  print_test("Prueba heap encolar enteros clave7", heap_encolar(heap, &clave7));
+  print_test("Prueba heap desencolar enteros es clave6", 
+    heap_ver_max(heap)==&clave3);
+
+  heap_destruir(heap,NULL);
+}
+
+static void prueba_heap_free_propio(){
+  heap_t* heap = heap_crear(comparar_enteros);
+  
+	int *aux,i;
+
+	for(i=0;i<100;i++){
+		aux = malloc(sizeof(int));
+		*aux = i;
+    		heap_encolar(heap,aux);
+	}
+
+  print_test("Prueba heap free propio", *(int*)(heap_ver_max(heap))== 99);
+  heap_destruir(heap,free);	
+}
+//Encola en volumen, 
+static void prueba_heap_volumen(int tam){
+  heap_t* heap = heap_crear(comparar_enteros);
+  
+	int i,*aux;
+
+	for(i=0;i<tam;i++){
+		aux = malloc(sizeof(int));
+		*aux = i;
+    		heap_encolar(heap,aux);
+	}
+	
+  print_test("Prueba heap de volumen", *(int*)(heap_ver_max(heap))== tam-1);
+
+  heap_destruir(heap,free);
+}
+
+//Se pasa un arreglo con claves ordenadas de menor a mayor, y se espera que 
+//las encole a un heap, para luego ir obteniendo de mayor a menor.
+static void prueba_heapify(size_t tam){
+	void** arreglo = malloc(sizeof(int*)*tam);
+
+	for(int i=0;i<(int)tam;i++){
+		int* aux = malloc(sizeof(int));
+		*aux = i;
+		arreglo[i]=aux;
+	} 	
+
+	heap_t* heap = heap_crear_arr(arreglo,tam,comparar_enteros); 
+	print_test("Prueba heap_crear_arr devuelve heap ", heap);
+	print_test("Prueba heap_crear_arr, el heap no esta vacio",
+		!heap_esta_vacio(heap));
+	print_test("Prueba heap_crear_arr, ver_max",
+    *(int*)heap_ver_max(heap)==*(int*)arreglo[tam-1]);
+
+	bool ok;
+	for(int i =(int)tam-1;i>=0;i--){
+		ok = (heap_desencolar(heap) == arreglo[i]);
+	
+	}
+	print_test("Prueba orden de desencolado en heapify",ok);
+
+	
+
+	for(int i = 0;i<(int)tam;i++){
+		free(arreglo[i]);
+	}
+	free(arreglo);
+
+	heap_destruir(heap,free);
+	
+}
+
+
+//Se pasa un arreglo con claves ordenadas de menor a mayor, y se espera que 
+//las encole a un heap, para luego ir obteniendo de mayor a menor.
+static void prueba_heap_sort(size_t tam){
+	void** arreglo = malloc(sizeof(int*)*tam);
+
+	for(int i=0;i<(int)tam;i++){
+		int* aux = malloc(sizeof(int));
+		*aux = i;
+		arreglo[i]=aux;
+	} 	
+	
+	heap_sort(arreglo,tam,comparar_enteros);
+	
+	bool ok=true;
+	for(int i = 0;i<=(int)tam-2;i++){
+		if(comparar_enteros(arreglo[i],arreglo[i+1])>0){
+			ok = false;
+			break;
+		}
+	}
+
+	print_test("Prueba orden de arreglo prueba_heap_sort",ok);
+	
+
+	for(int i = 0;i<(int)tam;i++){
+		free(arreglo[i]);
+	}
+	free(arreglo);
+
+	
+}
+
+
+
+void prueba_heap_sort_2(){
+	size_t tam = 3;
+	void** arreglo = malloc(sizeof(int*)*tam);
+
+	int* a = malloc(sizeof(int));
+	int* b = malloc(sizeof(int));
+	int* c = malloc(sizeof(int));
+
+	*a = 20;
+	*b = 300;
+	*c = 4000;
+
+	arreglo[1]=a;
+	arreglo[2]=b;
+	arreglo[0]=c;
+
+	heap_sort(arreglo,tam,comparar_enteros);
+
+	print_test("Prueba heap_sort, ver pos 0 es a", arreglo[0]==a);
+	print_test("Prueba heap_sort, ver pos 1 es b", arreglo[1]==b);
+	print_test("Prueba heap_sort, ver pos 2 es c", arreglo[2]==c);
+
+	heap_sort(arreglo,tam,comparar_enteros);
+
+	bool ok=true;
+	if(arreglo[0]!=a || arreglo[1] != b || arreglo[2]!=c) ok = false;
+	print_test("Prueba heap_sort en un arreglo ordenado",ok);
+	
+
+	for(int i = 0;i<(int)tam;i++){
+		free(arreglo[i]);
+	}
+	free(arreglo);
+
+
+}
+void prueba_heap_encolar_memoria_dinamica(){
+	heap_t* heap = heap_crear(comparar_enteros);
+
+	
+	int* a = malloc(sizeof(int));
+	int* b = malloc(sizeof(int));
+	int* c = malloc(sizeof(int));
+
+	*a = 1;
+	*b = 2;
+	*c = 3;
+	
+	print_test("Prueba heap encolar elemento a",heap_encolar(heap,a));
+	print_test("Prueba heap encolar elemento b",heap_encolar(heap,b));
+	print_test("Prueba heap encolar elemento c",heap_encolar(heap,c));
+	print_test("Ver maximo es c",heap_ver_max(heap)==c);
+
+	heap_destruir(heap,free);
+
+}
+void pruebas_heap_alumno()
+{
+    /* Ejecuta todas las pruebas unitarias. */
+    prueba_crear_heap_vacio();
+    prueba_heap_encolar_cadenas();
+    prueba_heap_desencolar_cadenas();
+    prueba_heap_encolar_enteros();
+    prueba_heap_desencolar_enteros();
+    prueba_heap_free_propio();
+    prueba_heap_volumen(5000);
+    prueba_heapify(5000);
+    prueba_heap_sort(100);
+    prueba_heap_sort_2(1000);
+   	prueba_heap_encolar_memoria_dinamica();
+
+    if(!failure_count())
+        printf("Se finalizaron todas las pruebas sin errores\n");
+}
+
+\end{lstlisting}
+
+
+\end{document}

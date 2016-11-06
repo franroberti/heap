@@ -175,7 +175,7 @@ static void prueba_heap_volumen(int tam){
 
 //Se pasa un arreglo con claves ordenadas de menor a mayor, y se espera que 
 //las encole a un heap, para luego ir obteniendo de mayor a menor.
-static void prueba_heapify(size_t tam){
+static void prueba_heap_crear_arr(size_t tam){
 	void** arreglo = malloc(sizeof(int*)*tam);
 
 	for(int i=0;i<(int)tam;i++){
@@ -187,21 +187,18 @@ static void prueba_heapify(size_t tam){
 	heap_t* heap = heap_crear_arr(arreglo,tam,comparar_enteros); 
 	print_test("Prueba heap_crear_arr devuelve heap ", heap);
 	print_test("Prueba heap_crear_arr, el heap no esta vacio",!heap_esta_vacio(heap));
-	print_test("Prueba heap_crear_arr, ver_max",*(int*)heap_ver_max(heap)==*(int*)arreglo[tam-1]);
+	print_test("Prueba heap_crear_arr, ver_max",*(int*)heap_ver_max(heap)== (int)(tam-1));
+    print_test("Prueba heap_crear_arr, cantidad",heap_cantidad(heap)==tam);
 
 	bool ok;
+
 	for(int i =(int)tam-1;i>=0;i--){
-		ok = (heap_desencolar(heap) == arreglo[i]);
-	
+        int* temp = heap_desencolar(heap);
+		ok = (*temp == i);
+        free(temp);
 	}
-	print_test("Prueba orden de desencolado en heapify",ok);
 
-	
-
-	for(int i = 0;i<(int)tam;i++){
-		free(arreglo[i]);
-	}
-	free(arreglo);
+	print_test("Prueba heap_crear_arr orden de desencolado",ok);
 
 	heap_destruir(heap,free);
 	
@@ -308,7 +305,7 @@ void pruebas_heap_alumno()
     prueba_heap_desencolar_enteros();
     prueba_heap_free_propio();
     prueba_heap_volumen(5000);
-    prueba_heapify(5000);
+    prueba_heap_crear_arr(5000);
     prueba_heap_sort(100);
     prueba_heap_sort_2(1000);
    	prueba_heap_encolar_memoria_dinamica();
