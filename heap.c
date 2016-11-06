@@ -214,7 +214,7 @@ void** copiar_arreglo(void*arreglo[],size_t cant){
 	for(size_t i = 0;i<cant;i++){
 		void* temp = malloc(sizeof(void*));
 		if(!temp) return NULL;
-		memcpy(temp,arreglo[i],sizeof(arreglo[i]));
+		memcpy(temp,arreglo[i],sizeof(void*));
 
 		aux[i]=temp;
 	}
