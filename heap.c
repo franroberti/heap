@@ -14,6 +14,8 @@ void upheap(void *elementos[], size_t posicion, cmp_func_t cmp);
 void swap(void* elementos[], size_t pos1, size_t pos2);
 void _heap_sort(void* elementos[],size_t cant,cmp_func_t cmp);
 void heapify(void* elementos[], size_t cant, cmp_func_t cmp);
+void** copiar_arreglo(void*arreglo[],size_t cant);
+
 
 struct heap{
 	void** arreglo;
@@ -45,12 +47,13 @@ heap_t *heap_crear(cmp_func_t cmp){
 
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 	
-	heapify(arreglo,n,cmp);
+	void** aux = copiar_arreglo(arreglo,n);
+	heapify(aux,n,cmp);
 
 	heap_t* heap = heap_crear(cmp);
 	free(heap->arreglo);
 
-	heap -> arreglo = arreglo;
+	heap -> arreglo = aux;
 	heap->cantidad = n;
 	heap->capacidad = n;
 
@@ -203,4 +206,18 @@ void swap(void* elementos[], size_t pos1, size_t pos2){
 	void* aux = elementos[pos1];
 	elementos[pos1] = elementos[pos2];
 	elementos[pos2] = aux;
+}
+
+void** copiar_arreglo(void*arreglo[],size_t cant){
+	void** aux = malloc(sizeof(void*)*cant);
+	if(!aux) return NULL;
+	for(size_t i = 0;i<cant;i++){
+		void* temp = malloc(sizeof(arreglo[i]));
+		if(!temp) return NULL;
+		memcpy(temp,arreglo[i],sizeof(arreglo[i]));
+
+		aux[i]=temp;
+	}
+
+	return aux;
 }
