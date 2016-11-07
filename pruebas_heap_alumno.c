@@ -186,9 +186,6 @@ static void prueba_heap_crear_arr(size_t tam){
 
 	heap_t* heap = heap_crear_arr(arreglo,tam,comparar_enteros); 
 
-    for(unsigned int i = 0; i<tam;i++){
-        free(arreglo[i]);
-    }
     free(arreglo);
 
 	print_test("Prueba heap_crear_arr devuelve heap ", heap);
